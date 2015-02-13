@@ -1,12 +1,13 @@
 module.exports = function (window) {
     "use strict";
 
+    require('itags.core')(window);
+
     var itagName = 'i-label', // <-- define your own itag-name here
         DOCUMENT = window.document,
-        Event = require('event-dom')(window),
+        ITSA = window.ITSA,
+        Event = ITSA.Event,
         Itag;
-
-    require('itags.core')(window);
 
     if (!window.ITAGS[itagName]) {
 
@@ -36,10 +37,8 @@ module.exports = function (window) {
                 // element.defineWhenUndefined('someprop', somevalue); // sets element.model.someprop = somevalue; when not defined yet
                 element.defineWhenUndefined('content', content);
 
-
                 // make the form wait to show until this element is rendered:
                 element.setAttr('itag-formwait', 'true', true);
-
 
                 if (element.getParent()) {
                     // already in the dom --> we can encapsulate
