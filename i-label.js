@@ -55,9 +55,10 @@ module.exports = function (window) {
                     prevSuppress = DOCUMENT._suppressMutationEvents || false,
                     parentNode = element.getParent(),
                     parentVNode = parentNode.vnode,
-                    rowVNode, vnode, vChildNodes, i, len, absorbed;
+                    rowNode, rowVNode, vnode, vChildNodes, i, len, absorbed, noblock;
                 DOCUMENT.suppressMutationEvents(true);
-                rowVNode = parentNode.prepend('<div class="i-formrow"></div>', false, element).vnode;
+                rowNode = parentNode.prepend('<div class="i-formrow"></div>', false, element);
+                rowVNode = rowNode.vnode;
                 // now absorb all next nodes, and finish when an i-form-element has been absorbed:
                 vChildNodes = parentVNode.vChildNodes;
                 i = vChildNodes.indexOf(rowVNode) + 1;
@@ -67,7 +68,12 @@ module.exports = function (window) {
                     vnode = vChildNodes[i];
                     rowVNode._appendChild(vnode);
                     absorbed = vnode.isItag && (vnode.tag!=='I-LABEL');
+                    if (absorbed) {
+                        // noblock = vnode.domNode.keepInline();
+                        noblock = (vnode.tag==='I-CHECKBOX');
+                    }
                 }
+                absorbed && noblock && rowNode.setClass('itag-noblock');
                 DOCUMENT.suppressMutationEvents(prevSuppress);
             },
 
