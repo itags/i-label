@@ -31,7 +31,6 @@ module.exports = function (window) {
                 var element = this,
                     designNode = element.getDesignNode(),
                     content = designNode.getHTML();
-
                 // when initializing: make sure NOT to overrule model-properties that already
                 // might have been defined when modeldata was boundend. Therefore, use `defineWhenUndefined`
                 // element.defineWhenUndefined('someprop', somevalue); // sets element.model.someprop = somevalue; when not defined yet
