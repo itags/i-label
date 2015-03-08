@@ -22,7 +22,7 @@ module.exports = function (window) {
             }
         }, 'i-label');
 
-        Itag = DOCUMENT.createItag(itagName, {
+        Itag = DOCUMENT.defineItag(itagName, {
             attrs: {
                 content: 'string'
             },
