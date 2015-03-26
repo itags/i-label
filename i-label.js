@@ -36,15 +36,17 @@ module.exports = function (window) {
                 // element.defineWhenUndefined('someprop', somevalue); // sets element.model.someprop = somevalue; when not defined yet
                 element.defineWhenUndefined('content', content);
 
-                // make the form wait to show until this element is rendered:
-                element.setAttr('itag-formwait', 'true', true);
-
                 if (element.getParent()) {
                     // already in the dom --> we can encapsulate
                     element.encapsulate();
+                    element._waitBeforeReady = window.Promise.resolve();
                 }
                 else {
-                    element.selfOnceAfter('UI:nodeinsert', element.encapsulate.bind(element));
+                    element._waitBeforeReady = window.Promise.manage();
+                    element.selfOnceAfter('UI:nodeinsert', function() {
+                        element.encapsulate();
+                        element._waitBeforeReady.fulfill();
+                    });
                 }
                 // set the inner-content of the label will be done when syncing
             },
@@ -74,6 +76,12 @@ module.exports = function (window) {
                 }
                 absorbed && noblock && rowNode.setClass('itag-noblock');
                 DOCUMENT.suppressMutationEvents(prevSuppress);
+            },
+
+            itagReady: function() {
+                var element = this;
+                element._itagReady || (element._itagReady=window.Promise.manage());
+                return element._itagReady.then(element._waitBeforeReady);
             },
 
             decapsulate: function() {
