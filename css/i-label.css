@@ -34,3 +34,10 @@ i-label {
     box-sizing: border-box;
 }
 
+div.i-formrow >[itag-formelement="true"] {
+    margin-left: 0.5em;
+}
+
+div.i-formrow >[itag-formelement="true"]:first-child {
+    margin-left: 0;
+}

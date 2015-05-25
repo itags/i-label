@@ -1,6 +1,7 @@
 module.exports = function (window) {
     "use strict";
 
+    require('./css/i-label.css');
     require('itags.core')(window);
 
     var itagName = 'i-label', // <-- define your own itag-name here
@@ -24,7 +25,8 @@ module.exports = function (window) {
 
         Itag = DOCUMENT.defineItag(itagName, {
             attrs: {
-                content: 'string'
+                content: 'string',
+                wrap: 'number'
             },
 
             init: function() {
@@ -34,7 +36,8 @@ module.exports = function (window) {
                 // when initializing: make sure NOT to overrule model-properties that already
                 // might have been defined when modeldata was boundend. Therefore, use `defineWhenUndefined`
                 // element.defineWhenUndefined('someprop', somevalue); // sets element.model.someprop = somevalue; when not defined yet
-                element.defineWhenUndefined('content', content);
+                element.defineWhenUndefined('content', content)
+                       .defineWhenUndefined('wrap', 1);
 
                 if (element.getParent()) {
                     // already in the dom --> we can encapsulate
@@ -56,7 +59,9 @@ module.exports = function (window) {
                     prevSuppress = DOCUMENT._suppressMutationEvents || false,
                     parentNode = element.getParent(),
                     parentVNode = parentNode.vnode,
-                    rowNode, rowVNode, vnode, vChildNodes, i, len, absorbed, noblock;
+                    absorbed = 0,
+                    wrap = element.model.wrap,
+                    rowNode, rowVNode, vnode, vChildNodes, i, len, noblock;
                 DOCUMENT.suppressMutationEvents(true);
                 rowNode = parentNode.prepend('<div class="i-formrow"></div>', false, element);
                 rowVNode = rowNode.vnode;
@@ -65,11 +70,13 @@ module.exports = function (window) {
                 i = vChildNodes.indexOf(rowVNode) + 1;
                 len = vChildNodes.length;
                 // i doesn't change: it is len that will decrease, because we absorb items
-                while (!absorbed && (i<=(--len))) {
+                while ((absorbed<wrap) && (i<=(--len))) {
                     vnode = vChildNodes[i];
                     rowVNode._appendChild(vnode);
-                    absorbed = vnode.isItag && (vnode.tag!=='I-LABEL');
-                    if (absorbed) {
+                    if (vnode.isItag && (vnode.tag!=='I-LABEL')) {
+                        absorbed++;
+                    }
+                    if ((wrap===1) && (absorbed>=wrap)) {
                         // noblock = vnode.domNode.keepInline();
                         noblock = (vnode.tag==='I-CHECKBOX');
                     }
